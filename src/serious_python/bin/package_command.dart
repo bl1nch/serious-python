@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:args/command_runner.dart';
 import 'package:crypto/crypto.dart';
 import 'package:glob/glob.dart';
