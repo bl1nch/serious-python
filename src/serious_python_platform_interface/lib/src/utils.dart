@@ -62,16 +62,7 @@ Future<String> extractAssetOrFile(String path,
       final inputStream = InputFileStream(path);
       archive = ZipDecoder().decodeStream(inputStream);
     }
-    for (final file in archive) {
-      final filePath = p.join(destDir.path, file.name);
-      if (file.isFile) {
-        final outFile = File(filePath);
-        await outFile.create(recursive: true);
-        await outFile.writeAsBytes(file.content as List<int>);
-      } else {
-        await Directory(filePath).create(recursive: true);
-      }
-    }
+    await extractArchiveToDisk(archive, destDir.path);
   } catch (e) {
     debugPrint("Error unpacking archive: $e");
     await destDir.delete(recursive: true);
