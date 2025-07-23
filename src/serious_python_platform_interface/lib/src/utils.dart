@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -60,9 +60,18 @@ Future<String> extractAssetOrFile(String path,
       archive = ZipDecoder().decodeBytes(data);
     } else {
       final inputStream = InputFileStream(path);
-      archive = ZipDecoder().decodeBuffer(inputStream);
+      archive = ZipDecoder().decodeStream(inputStream);
     }
-    await extractArchiveToDiskAsync(archive, destDir.path, asyncWrite: true);
+    for (final file in archive) {
+      final filePath = p.join(destDir.path, file.name);
+      if (file.isFile) {
+        final outFile = File(filePath);
+        await outFile.create(recursive: true);
+        await outFile.writeAsBytes(file.content as List<int>);
+      } else {
+        await Directory(filePath).create(recursive: true);
+      }
+    }
   } catch (e) {
     debugPrint("Error unpacking archive: $e");
     await destDir.delete(recursive: true);
